@@ -1,27 +1,33 @@
 package domain.entity;
 
+import java.util.Objects;
+
 /**
  * Entity inti yang merepresentasikan satu kegiatan.
  * Berada di layer domain, tidak bergantung pada layer lain.
+ * Immutable: perubahan data dilakukan dengan membuat objek baru lewat {@code withX(...)}.
  */
 public class Activity {
     /** ID unik kegiatan, tidak boleh diubah setelah dibuat. */
     private final int id;
 
     /** Judul kegiatan. */
-    private String title;
+    private final String title;
 
     /** Hari pelaksanaan kegiatan. */
-    private String day;
+    private final String day;
 
     /** Waktu pelaksanaan kegiatan (contoh: 08:00). */
-    private String time;
+    private final String time;
 
+    /**
+     * @throws NullPointerException jika judul, hari, atau waktu null
+     */
     public Activity(int id, String title, String day, String time) {
         this.id = id;
-        this.title = title;
-        this.day = day;
-        this.time = time;
+        this.title = Objects.requireNonNull(title, "Judul tidak boleh null");
+        this.day = Objects.requireNonNull(day, "Hari tidak boleh null");
+        this.time = Objects.requireNonNull(time, "Waktu tidak boleh null");
     }
 
     public int getId() {
@@ -40,18 +46,18 @@ public class Activity {
         return time;
     }
 
-    /** Mengubah judul kegiatan. */
-    public void changeTitle(String title) {
-        this.title = title;
+    /** Mengembalikan salinan kegiatan dengan judul baru. */
+    public Activity withTitle(String newTitle) {
+        return new Activity(id, newTitle, day, time);
     }
 
-    /** Mengubah hari kegiatan. */
-    public void changeDay(String day) {
-        this.day = day;
+    /** Mengembalikan salinan kegiatan dengan hari baru. */
+    public Activity withDay(String newDay) {
+        return new Activity(id, title, newDay, time);
     }
 
-    /** Mengubah waktu kegiatan. */
-    public void changeTime(String time) {
-        this.time = time;
+    /** Mengembalikan salinan kegiatan dengan waktu baru. */
+    public Activity withTime(String newTime) {
+        return new Activity(id, title, day, newTime);
     }
 }

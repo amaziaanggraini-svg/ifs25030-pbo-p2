@@ -32,8 +32,13 @@ public class ContactView {
                 case "3" -> searchContact();
                 case "4" -> sortContact();
                 case "5" -> removeContact();
-                case "x" -> running = false;
-                default -> System.out.println(presenter.formatInvalidChoice());
+                default -> {
+                    if (InputUtil.isCancel(input)) {
+                        running = false;
+                    } else {
+                        System.out.println(presenter.formatInvalidChoice());
+                    }
+                }
             }
 
             if (running) {
@@ -90,12 +95,8 @@ public class ContactView {
         String newPhone = InputUtil.input("Telepon Baru (Kosongkan jika tidak ingin mengubah)");
         String newEmail = InputUtil.input("Email Baru (Kosongkan jika tidak ingin mengubah)");
 
-        // null berarti field tersebut tidak diubah
-        String name = newName.isBlank() ? null : newName;
-        String phone = newPhone.isBlank() ? null : newPhone;
-        String email = newEmail.isBlank() ? null : newEmail;
-
-        if (contactUseCase.updateContact(id, name, phone, email)) {
+        // Input kosong = tidak diubah; aturan ini ditangani oleh use case
+        if (contactUseCase.updateContact(id, newName, newPhone, newEmail)) {
             System.out.println(presenter.formatUpdateSuccess());
         } else {
             System.out.println(presenter.formatUpdateFailed(id));

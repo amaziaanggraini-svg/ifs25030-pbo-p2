@@ -17,7 +17,8 @@ public class GuestRepository implements IGuestRepository {
 
     @Override
     public Guest save(String name, String purpose) {
-        Guest guest = new Guest(++idCounter, name, purpose);
+        Guest guest = new Guest(idCounter + 1, name, purpose);
+        idCounter++;
         guests.add(guest);
         return guest;
     }

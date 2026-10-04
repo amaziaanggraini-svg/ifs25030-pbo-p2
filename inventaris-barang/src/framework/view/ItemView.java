@@ -37,8 +37,13 @@ public class ItemView {
                 case "3" -> searchItem();
                 case "4" -> sortItem();
                 case "5" -> removeItem();
-                case "x" -> running = false;
-                default -> System.out.println(presenter.formatInvalidChoice());
+                default -> {
+                    if (InputUtil.isCancel(input)) {
+                        running = false;
+                    } else {
+                        System.out.println(presenter.formatInvalidChoice());
+                    }
+                }
             }
 
             if (running) {
@@ -181,14 +186,15 @@ public class ItemView {
     }
 
     /**
-     * Mengonversi input string menjadi jumlah stok (harus numerik dan > 0).
+     * Mengonversi input string menjadi jumlah stok. Format angka dicek di sini,
+     * aturan bisnis jumlah stok ditanyakan ke use case.
      *
      * @return jumlah jika valid, null jika tidak valid (error sudah ditampilkan)
      */
     private Integer parseQuantity(String value) {
         try {
             int quantity = Integer.parseInt(value);
-            if (quantity <= 0) {
+            if (!itemUseCase.isValidQuantity(quantity)) {
                 System.out.println(presenter.formatInvalidQuantity());
                 return null;
             }

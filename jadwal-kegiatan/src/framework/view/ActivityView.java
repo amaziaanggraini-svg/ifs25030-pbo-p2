@@ -37,8 +37,13 @@ public class ActivityView {
                 case "3" -> searchActivity();
                 case "4" -> sortActivity();
                 case "5" -> removeActivity();
-                case "x" -> running = false;
-                default -> System.out.println(presenter.formatInvalidChoice());
+                default -> {
+                    if (InputUtil.isCancel(input)) {
+                        running = false;
+                    } else {
+                        System.out.println(presenter.formatInvalidChoice());
+                    }
+                }
             }
 
             if (running) {
@@ -98,12 +103,8 @@ public class ActivityView {
         String newDay = InputUtil.input("Hari Baru (Kosongkan jika tidak ingin mengubah)");
         String newTime = InputUtil.input("Waktu Baru (Kosongkan jika tidak ingin mengubah)");
 
-        // null berarti field tersebut tidak diubah
-        String title = newTitle.isBlank() ? null : newTitle;
-        String day = newDay.isBlank() ? null : newDay;
-        String time = newTime.isBlank() ? null : newTime;
-
-        if (activityUseCase.updateActivity(id, title, day, time)) {
+        // Input kosong = tidak diubah; aturan ini ditangani oleh use case
+        if (activityUseCase.updateActivity(id, newTitle, newDay, newTime)) {
             System.out.println(presenter.formatUpdateSuccess());
         } else {
             System.out.println(presenter.formatUpdateFailed(id));

@@ -32,7 +32,8 @@ public class ItemRepository implements IItemRepository {
 
     @Override
     public Item save(String name, int quantity, String category) {
-        Item item = new Item(nextId(), name, quantity, category);
+        Item item = new Item(idCounter + 1, name, quantity, category);
+        idCounter++;
         data.add(item);
         return item;
     }
@@ -44,13 +45,12 @@ public class ItemRepository implements IItemRepository {
 
     @Override
     public void update(Item item) {
-        // Entity bersifat mutable dan disimpan by-reference, sehingga perubahan
-        // pada instance sudah otomatis tercermin di penyimpanan in-memory.
-        // Method ini tetap ada agar kontrak port valid untuk implementasi lain.
-    }
-
-    /** Menghasilkan ID unik berikutnya. */
-    private int nextId() {
-        return ++idCounter;
+        // Entity immutable: elemen lama harus diganti dengan objek baru yang ber-ID sama.
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getId() == item.getId()) {
+                data.set(i, item);
+                return;
+            }
+        }
     }
 }

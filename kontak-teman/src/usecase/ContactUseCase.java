@@ -34,7 +34,7 @@ public class ContactUseCase {
 
     /**
      * Mengubah nama, telepon, dan/atau email (update parsial).
-     * Parameter {@code null} berarti field tersebut tidak diubah.
+     * Parameter {@code null} atau kosong berarti field tersebut tidak diubah.
      *
      * @return true jika kontak ditemukan dan diperbarui
      */
@@ -46,18 +46,24 @@ public class ContactUseCase {
 
         Contact contact = found.get();
 
-        if (name != null) {
-            contact.changeName(name);
+        // Entity immutable: buat objek baru untuk setiap field yang diisi
+        if (hasValue(name)) {
+            contact = contact.withName(name);
         }
-        if (phone != null) {
-            contact.changePhone(phone);
+        if (hasValue(phone)) {
+            contact = contact.withPhone(phone);
         }
-        if (email != null) {
-            contact.changeEmail(email);
+        if (hasValue(email)) {
+            contact = contact.withEmail(email);
         }
 
         contactRepository.update(contact);
         return true;
+    }
+
+    /** Aturan update parsial: nilai null atau kosong berarti tidak diubah. */
+    private boolean hasValue(String value) {
+        return value != null && !value.isBlank();
     }
 
     /** Mencari kontak yang namanya mengandung kata kunci (case-insensitive). */

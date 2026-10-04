@@ -30,7 +30,8 @@ public class ContactRepository implements IContactRepository {
 
     @Override
     public Contact save(String name, String phone, String email) {
-        Contact contact = new Contact(nextId(), name, phone, email);
+        Contact contact = new Contact(idCounter + 1, name, phone, email);
+        idCounter++;
         data.add(contact);
         return contact;
     }
@@ -42,11 +43,12 @@ public class ContactRepository implements IContactRepository {
 
     @Override
     public void update(Contact contact) {
-        // Entity mutable dan disimpan by-reference, perubahan sudah tercermin.
-        // Method ini tetap ada agar kontrak port valid untuk implementasi lain.
-    }
-
-    private int nextId() {
-        return ++idCounter;
+        // Entity immutable: elemen lama harus diganti dengan objek baru yang ber-ID sama.
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getId() == contact.getId()) {
+                data.set(i, contact);
+                return;
+            }
+        }
     }
 }

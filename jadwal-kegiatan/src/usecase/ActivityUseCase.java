@@ -35,7 +35,7 @@ public class ActivityUseCase {
 
     /**
      * Mengubah judul, hari, dan/atau waktu kegiatan (update parsial).
-     * Parameter {@code null} berarti field tersebut tidak diubah.
+     * Parameter {@code null} atau kosong berarti field tersebut tidak diubah.
      *
      * @return true jika kegiatan ditemukan dan diperbarui
      */
@@ -47,19 +47,24 @@ public class ActivityUseCase {
 
         Activity activity = found.get();
 
-        // Hanya ubah field yang eksplisit diberikan (bukan null)
-        if (title != null) {
-            activity.changeTitle(title);
+        // Entity immutable: buat objek baru untuk setiap field yang diisi
+        if (hasValue(title)) {
+            activity = activity.withTitle(title);
         }
-        if (day != null) {
-            activity.changeDay(day);
+        if (hasValue(day)) {
+            activity = activity.withDay(day);
         }
-        if (time != null) {
-            activity.changeTime(time);
+        if (hasValue(time)) {
+            activity = activity.withTime(time);
         }
 
         activityRepository.update(activity);
         return true;
+    }
+
+    /** Aturan update parsial: nilai null atau kosong berarti tidak diubah. */
+    private boolean hasValue(String value) {
+        return value != null && !value.isBlank();
     }
 
     /** Mencari kegiatan yang judulnya mengandung kata kunci (case-insensitive). */

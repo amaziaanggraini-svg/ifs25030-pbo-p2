@@ -23,7 +23,16 @@ public class ItemUseCase {
         return itemRepository.findAll();
     }
 
-    /** Menambahkan barang baru dan mengembalikan entity yang tersimpan. */
+    /** Aturan bisnis jumlah stok (harus lebih dari 0). View memakainya untuk validasi dini. */
+    public boolean isValidQuantity(int quantity) {
+        return Item.isValidQuantity(quantity);
+    }
+
+    /**
+     * Menambahkan barang baru dan mengembalikan entity yang tersimpan.
+     *
+     * @throws IllegalArgumentException jika jumlah stok tidak valid
+     */
     public Item addItem(String name, int quantity, String category) {
         return itemRepository.save(name, quantity, category);
     }
@@ -38,8 +47,14 @@ public class ItemUseCase {
      * Parameter {@code null} berarti stok tidak diubah.
      *
      * @return true jika barang ditemukan dan diperbarui
+     * @throws IllegalArgumentException jika jumlah stok baru tidak valid
      */
     public boolean updateStock(int id, Integer quantity) {
+        // Validasi lebih dulu agar input salah tidak tertutup oleh "barang tidak ditemukan"
+        if (quantity != null && !Item.isValidQuantity(quantity)) {
+            throw new IllegalArgumentException("Jumlah stok harus lebih dari 0");
+        }
+
         Optional<Item> found = itemRepository.findById(id);
         if (found.isEmpty()) {
             return false;
@@ -47,9 +62,9 @@ public class ItemUseCase {
 
         Item item = found.get();
 
-        // Hanya ubah field yang eksplisit diberikan (bukan null)
+        // Entity immutable: buat objek baru untuk field yang diubah
         if (quantity != null) {
-            item.changeQuantity(quantity);
+            item = item.withQuantity(quantity);
         }
 
         itemRepository.update(item);

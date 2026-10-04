@@ -1,21 +1,27 @@
 package domain.entity;
 
+import java.util.Objects;
+
 /**
  * Entity inti yang merepresentasikan satu kontak teman.
+ * Immutable: perubahan data dilakukan dengan membuat objek baru lewat {@code withX(...)}.
  */
 public class Contact {
     /** ID unik kontak, tidak boleh diubah setelah dibuat. */
     private final int id;
 
-    private String name;
-    private String phone;
-    private String email;
+    private final String name;
+    private final String phone;
+    private final String email;
 
+    /**
+     * @throws NullPointerException jika nama, telepon, atau email null
+     */
     public Contact(int id, String name, String phone, String email) {
         this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
+        this.name = Objects.requireNonNull(name, "Nama tidak boleh null");
+        this.phone = Objects.requireNonNull(phone, "Telepon tidak boleh null");
+        this.email = Objects.requireNonNull(email, "Email tidak boleh null");
     }
 
     public int getId() {
@@ -34,18 +40,18 @@ public class Contact {
         return email;
     }
 
-    /** Mengubah nama kontak. */
-    public void changeName(String name) {
-        this.name = name;
+    /** Mengembalikan salinan kontak dengan nama baru. */
+    public Contact withName(String newName) {
+        return new Contact(id, newName, phone, email);
     }
 
-    /** Mengubah nomor telepon kontak. */
-    public void changePhone(String phone) {
-        this.phone = phone;
+    /** Mengembalikan salinan kontak dengan telepon baru. */
+    public Contact withPhone(String newPhone) {
+        return new Contact(id, name, newPhone, email);
     }
 
-    /** Mengubah email kontak. */
-    public void changeEmail(String email) {
-        this.email = email;
+    /** Mengembalikan salinan kontak dengan email baru. */
+    public Contact withEmail(String newEmail) {
+        return new Contact(id, name, phone, newEmail);
     }
 }
