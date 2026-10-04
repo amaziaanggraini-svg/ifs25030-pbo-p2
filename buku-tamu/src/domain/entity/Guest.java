@@ -1,37 +1,34 @@
 package domain.entity;
 
+/**
+ * Entity inti yang merepresentasikan satu tamu.
+ * Berada di layer domain, tidak bergantung pada layer lain.
+ */
 public class Guest {
-    private String id;
-    private String name;
-    private String purpose;
+    /** ID unik tamu, tidak boleh diubah setelah dibuat. */
+    private final int id;
 
-    public Guest(String id, String name, String purpose) {
+    /** Nama tamu. */
+    private final String name;
+
+    /** Tujuan kunjungan. */
+    private final String purpose;
+
+    public Guest(int id, String name, String purpose) {
         this.id = id;
         this.name = name;
         this.purpose = purpose;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPurpose() {
         return purpose;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
     }
 }

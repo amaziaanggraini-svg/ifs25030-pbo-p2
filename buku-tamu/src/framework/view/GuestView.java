@@ -1,10 +1,13 @@
 package framework.view;
 
 import adapter.presenter.GuestPresenter;
-import domain.entity.Guest;
 import framework.util.InputUtil;
 import usecase.GuestUseCase;
 
+/**
+ * Layer framework: UI konsol.
+ * Menerima input user, memanggil use case, lalu mencetak hasil format dari presenter.
+ */
 public class GuestView {
     private final GuestUseCase guestUseCase;
     private final GuestPresenter guestPresenter;
@@ -16,7 +19,7 @@ public class GuestView {
 
     public void show() {
         while (true) {
-            guestPresenter.printGuestList(guestUseCase.getAllGuests());
+            System.out.println(guestPresenter.formatGuestList(guestUseCase.getAllGuests()));
 
             System.out.println("Menu:");
             System.out.println("1. Daftarkan");
@@ -26,17 +29,16 @@ public class GuestView {
 
             String option = InputUtil.input("Pilih");
 
-            if (option.equalsIgnoreCase("1")) {
+            if (option.equals("1")) {
                 registerGuestView();
-            } else if (option.equalsIgnoreCase("2")) {
+            } else if (option.equals("2")) {
                 searchGuestView();
-            } else if (option.equalsIgnoreCase("3")) {
+            } else if (option.equals("3")) {
                 deleteGuestView();
-            } else if (option.equalsIgnoreCase("x")) {
+            } else if (InputUtil.isCancel(option)) {
                 break;
             } else {
-                // PERBAIKAN TC-03, TC-07, TC-11: Penanganan pilihan menu tidak valid
-                System.out.println("[!] Pilihan tidak dimengerti.");
+                System.out.println(guestPresenter.formatInvalidChoice());
                 System.out.println();
             }
         }
@@ -46,19 +48,18 @@ public class GuestView {
         System.out.println("[Mendaftarkan Tamu]");
 
         String name = InputUtil.input("Nama (x Jika Batal)");
-        if (name.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(name)) {
             System.out.println();
             return;
         }
 
         String purpose = InputUtil.input("Tujuan Kunjungan (x Jika Batal)");
-        if (purpose.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(purpose)) {
             System.out.println();
             return;
         }
 
-        Guest guest = guestUseCase.registerGuest(name, purpose);
-        guestPresenter.printSuccessRegister(guest);
+        System.out.println(guestPresenter.formatRegisterSuccess(guestUseCase.registerGuest(name, purpose)));
         System.out.println();
     }
 
@@ -66,12 +67,12 @@ public class GuestView {
         System.out.println("[Mencari Tamu]");
 
         String keyword = InputUtil.input("Nama (x Jika Batal)");
-        if (keyword.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(keyword)) {
             System.out.println();
             return;
         }
 
-        guestPresenter.printSearchResult(keyword, guestUseCase.searchGuests(keyword));
+        System.out.println(guestPresenter.formatSearchResult(keyword, guestUseCase.searchGuests(keyword)));
         System.out.println();
     }
 
@@ -79,26 +80,24 @@ public class GuestView {
         System.out.println("[Menghapus Tamu]");
 
         String idInput = InputUtil.input("[ID Tamu] yang dihapus (x Jika Batal)");
-        if (idInput.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(idInput)) {
             System.out.println();
             return;
         }
 
-        // PERBAIKAN TC-03 & TC-07: Validasi apakah input ID berupa angka
+        int id;
         try {
-            Integer.parseInt(idInput);
+            id = Integer.parseInt(idInput);
         } catch (NumberFormatException e) {
-            System.out.println("[!] ID tidak valid!");
+            System.out.println(guestPresenter.formatInvalidId());
             System.out.println();
             return;
         }
 
-        boolean success = guestUseCase.deleteGuest(idInput);
-        if (success) {
-            System.out.println("Berhasil menghapus tamu.");
+        if (guestUseCase.deleteGuest(id)) {
+            System.out.println(guestPresenter.formatDeleteSuccess());
         } else {
-            // PERBAIKAN TC-03 & TC-07: Pesan ID tidak ditemukan di daftar
-            System.out.println("[!] Gagal menghapus tamu dengan ID: " + idInput + ".");
+            System.out.println(guestPresenter.formatDeleteFailed(id));
         }
         System.out.println();
     }
