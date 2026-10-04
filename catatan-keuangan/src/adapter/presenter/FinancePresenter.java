@@ -1,45 +1,84 @@
 package adapter.presenter;
 
 import domain.entity.Transaction;
+
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Presenter yang HANYA memformat data menjadi String.
+ * Tidak mencetak apa pun; pencetakan dilakukan oleh View.
+ */
 public class FinancePresenter {
 
-    public void printTransactionList(List<Transaction> transactions, long balance) {
-        System.out.println("Daftar Transaksi:");
-        if (transactions.isEmpty()) {
-            System.out.println("- Belum ada transaksi!");
-        } else {
-            for (Transaction t : transactions) {
-                System.out.println(t.getId() + " | " + t.getDescription() + " | Rp " + t.getAmount() + " | " + t.getType());
-            }
-        }
-        System.out.println("Saldo: Rp " + balance);
+    /** Format satu transaksi: id | keterangan | Rp jumlah | jenis. */
+    private String format(Transaction t) {
+        return String.format("%d | %s | Rp %d | %s",
+                t.getId(), t.getDescription(), t.getAmount(), t.getType().getLabel());
     }
 
-    public void printSortedList(List<Transaction> transactions) {
-        System.out.println("Daftar Transaksi (Terurut):");
+    /** Header + baris transaksi. Jika emptyMessage tidak null, dipakai saat daftar kosong. */
+    private List<String> formatLines(String header, List<Transaction> transactions, String emptyMessage) {
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
+
+        if (transactions.isEmpty() && emptyMessage != null) {
+            lines.add(emptyMessage);
+        }
         for (Transaction t : transactions) {
-            System.out.println(t.getId() + " | " + t.getDescription() + " | Rp " + t.getAmount() + " | " + t.getType());
+            lines.add(format(t));
         }
+        return lines;
     }
 
-    public void printSearchResult(String keyword, List<Transaction> transactions) {
-        System.out.println("Hasil Pencarian: \"" + keyword + "\"");
-        if (transactions.isEmpty()) {
-            System.out.println("- Transaksi tidak ditemukan!");
-        } else {
-            for (Transaction t : transactions) {
-                System.out.println(t.getId() + " | " + t.getDescription() + " | Rp " + t.getAmount() + " | " + t.getType());
-            }
-        }
+    private String join(List<String> lines) {
+        return String.join(System.lineSeparator(), lines);
     }
 
-    public void printSuccessAdd(Transaction transaction) {
-        System.out.println("Berhasil menambah transaksi: " + transaction.getId() + " | " + transaction.getDescription() + " | Rp " + transaction.getAmount() + " | " + transaction.getType());
+    public String formatTransactionList(List<Transaction> transactions, long balance) {
+        List<String> lines = formatLines("Daftar Transaksi:", transactions, "- Belum ada transaksi!");
+        lines.add("Saldo: Rp " + balance);
+        return join(lines);
     }
 
-    public void printBalanceOnly(long balance) {
-        System.out.println("Saldo saat ini: Rp " + balance);
+    public String formatSortedList(List<Transaction> transactions) {
+        return join(formatLines("Daftar Transaksi (Terurut):", transactions, null));
+    }
+
+    public String formatSearchResult(String keyword, List<Transaction> transactions) {
+        return join(formatLines("Hasil Pencarian: \"" + keyword + "\"", transactions,
+                "- Transaksi tidak ditemukan!"));
+    }
+
+    public String formatAddSuccess(Transaction transaction) {
+        return "Berhasil menambah transaksi: " + format(transaction);
+    }
+
+    public String formatBalance(long balance) {
+        return "Saldo saat ini: Rp " + balance;
+    }
+
+    public String formatDeleteSuccess() {
+        return "Berhasil menghapus transaksi.";
+    }
+
+    public String formatDeleteFailed(int id) {
+        return "[!] Gagal menghapus transaksi dengan ID: " + id + ".";
+    }
+
+    public String formatInvalidChoice() {
+        return "[!] Pilihan tidak dimengerti.";
+    }
+
+    public String formatInvalidId() {
+        return "[!] ID tidak valid!";
+    }
+
+    public String formatInvalidAmount() {
+        return "[!] Jumlah tidak valid!";
+    }
+
+    public String formatInvalidSortOption() {
+        return "[!] Pilihan tidak valid!";
     }
 }

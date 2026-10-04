@@ -1,10 +1,15 @@
 package framework.view;
 
 import adapter.presenter.FinancePresenter;
-import domain.entity.Transaction;
+import domain.entity.SortOption;
+import domain.entity.TransactionType;
 import framework.util.InputUtil;
 import usecase.FinanceUseCase;
 
+/**
+ * Layer framework: UI konsol.
+ * Menerima input user, memanggil use case, lalu mencetak hasil format dari presenter.
+ */
 public class FinanceView {
     private final FinanceUseCase financeUseCase;
     private final FinancePresenter financePresenter;
@@ -16,10 +21,10 @@ public class FinanceView {
 
     public void show() {
         while (true) {
-            financePresenter.printTransactionList(
+            System.out.println(financePresenter.formatTransactionList(
                     financeUseCase.getAllTransactions(),
                     financeUseCase.getBalance()
-            );
+            ));
 
             System.out.println("Menu:");
             System.out.println("1. Tambah Pemasukan");
@@ -32,39 +37,39 @@ public class FinanceView {
 
             String option = InputUtil.input("Pilih");
 
-            if (option.equalsIgnoreCase("1")) {
-                addTransactionView("Pemasukan");
-            } else if (option.equalsIgnoreCase("2")) {
-                addTransactionView("Pengeluaran");
-            } else if (option.equalsIgnoreCase("3")) {
+            if (option.equals("1")) {
+                addTransactionView(TransactionType.INCOME);
+            } else if (option.equals("2")) {
+                addTransactionView(TransactionType.EXPENSE);
+            } else if (option.equals("3")) {
                 searchTransactionView();
-            } else if (option.equalsIgnoreCase("4")) {
+            } else if (option.equals("4")) {
                 sortTransactionView();
-            } else if (option.equalsIgnoreCase("5")) {
-                financePresenter.printBalanceOnly(financeUseCase.getBalance());
+            } else if (option.equals("5")) {
+                System.out.println(financePresenter.formatBalance(financeUseCase.getBalance()));
                 System.out.println();
-            } else if (option.equalsIgnoreCase("6")) {
+            } else if (option.equals("6")) {
                 deleteTransactionView();
-            } else if (option.equalsIgnoreCase("x")) {
+            } else if (InputUtil.isCancel(option)) {
                 break;
             } else {
-                System.out.println("[!] Pilihan tidak dimengerti.");
+                System.out.println(financePresenter.formatInvalidChoice());
                 System.out.println();
             }
         }
     }
 
-    private void addTransactionView(String type) {
-        System.out.println("[" + (type.equals("Pemasukan") ? "Tambah Pemasukan" : "Tambah Pengeluaran") + "]");
+    private void addTransactionView(TransactionType type) {
+        System.out.println("[Tambah " + type.getLabel() + "]");
 
         String description = InputUtil.input("Keterangan (x Jika Batal)");
-        if (description.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(description)) {
             System.out.println();
             return;
         }
 
         String amountStr = InputUtil.input("Jumlah");
-        if (amountStr.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(amountStr)) {
             System.out.println();
             return;
         }
@@ -72,19 +77,19 @@ public class FinanceView {
         long amount;
         try {
             amount = Long.parseLong(amountStr);
-            if (amount <= 0) {
-                System.out.println("[!] Jumlah tidak valid!");
-                System.out.println();
-                return;
-            }
         } catch (NumberFormatException e) {
-            System.out.println("[!] Jumlah tidak valid!");
+            System.out.println(financePresenter.formatInvalidAmount());
             System.out.println();
             return;
         }
 
-        Transaction transaction = financeUseCase.addTransaction(description, amount, type);
-        financePresenter.printSuccessAdd(transaction);
+        try {
+            System.out.println(financePresenter.formatAddSuccess(
+                    financeUseCase.addTransaction(description, amount, type)));
+        } catch (IllegalArgumentException e) {
+            // Domain menolak data (mis. jumlah <= 0)
+            System.out.println(financePresenter.formatInvalidAmount());
+        }
         System.out.println();
     }
 
@@ -92,38 +97,42 @@ public class FinanceView {
         System.out.println("[Cari Transaksi]");
 
         String keyword = InputUtil.input("Kata Kunci (x Jika Batal)");
-        if (keyword.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(keyword)) {
             System.out.println();
             return;
         }
 
-        financePresenter.printSearchResult(keyword, financeUseCase.searchTransactions(keyword));
+        System.out.println(financePresenter.formatSearchResult(
+                keyword, financeUseCase.searchTransactions(keyword)));
         System.out.println();
     }
 
     private void sortTransactionView() {
         System.out.println("[Urutkan Transaksi]");
-        System.out.println("1. Jumlah (Terkecil)");
-        System.out.println("2. Jumlah (Terbesar)");
-        System.out.println("3. Pemasukan Dulu");
-        System.out.println("4. Pengeluaran Dulu");
+
+        // Menu dibangun dari enum, sehingga nomor menu selalu sesuai opsi yang ada
+        SortOption[] options = SortOption.values();
+        for (int i = 0; i < options.length; i++) {
+            System.out.println((i + 1) + ". " + options[i].getLabel());
+        }
         System.out.println("x. Batal");
 
         String choice = InputUtil.input("Pilih");
-        if (choice.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(choice)) {
             System.out.println();
             return;
         }
 
         try {
-            int sortOption = Integer.parseInt(choice);
-            if (sortOption >= 1 && sortOption <= 4) {
-                financePresenter.printSortedList(financeUseCase.getSortedTransactions(sortOption));
+            int number = Integer.parseInt(choice);
+            if (number >= 1 && number <= options.length) {
+                System.out.println(financePresenter.formatSortedList(
+                        financeUseCase.sortTransactions(options[number - 1])));
             } else {
-                System.out.println("[!] Pilihan tidak valid!");
+                System.out.println(financePresenter.formatInvalidSortOption());
             }
         } catch (NumberFormatException e) {
-            System.out.println("[!] Pilihan tidak valid!");
+            System.out.println(financePresenter.formatInvalidSortOption());
         }
         System.out.println();
     }
@@ -132,24 +141,24 @@ public class FinanceView {
         System.out.println("[Hapus Transaksi]");
 
         String idInput = InputUtil.input("ID Transaksi (x Jika Batal)");
-        if (idInput.equalsIgnoreCase("x")) {
+        if (InputUtil.isCancel(idInput)) {
             System.out.println();
             return;
         }
 
+        int id;
         try {
-            Integer.parseInt(idInput);
+            id = Integer.parseInt(idInput);
         } catch (NumberFormatException e) {
-            System.out.println("[!] ID tidak valid!");
+            System.out.println(financePresenter.formatInvalidId());
             System.out.println();
             return;
         }
 
-        boolean success = financeUseCase.deleteTransaction(idInput);
-        if (success) {
-            System.out.println("Berhasil menghapus transaksi.");
+        if (financeUseCase.deleteTransaction(id)) {
+            System.out.println(financePresenter.formatDeleteSuccess());
         } else {
-            System.out.println("[!] Gagal menghapus transaksi dengan ID: " + idInput + ".");
+            System.out.println(financePresenter.formatDeleteFailed(id));
         }
         System.out.println();
     }
