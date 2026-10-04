@@ -27,7 +27,7 @@ public class ActivityView {
         boolean running = true;
         while (running) {
             // Tampilkan daftar kegiatan terkini sebelum menu
-            presenter.showActivities(activityUseCase.getAllActivities());
+            System.out.println(presenter.formatActivities(activityUseCase.getAllActivities()));
             printMenu();
 
             String input = InputUtil.input("Pilih");
@@ -38,7 +38,7 @@ public class ActivityView {
                 case "4" -> sortActivity();
                 case "5" -> removeActivity();
                 case "x" -> running = false;
-                default -> presenter.showInvalidChoice();
+                default -> System.out.println(presenter.formatInvalidChoice());
             }
 
             if (running) {
@@ -63,21 +63,21 @@ public class ActivityView {
     private void addActivity() {
         System.out.println("[Menambah Kegiatan]");
         String title = InputUtil.input("Judul (x Jika Batal)");
-        if (title.equals("x")) {
+        if (InputUtil.isCancel(title)) {
             return;
         }
 
         String day = InputUtil.input("Hari (x Jika Batal)");
-        if (day.equals("x")) {
+        if (InputUtil.isCancel(day)) {
             return;
         }
 
         String time = InputUtil.input("Waktu (x Jika Batal)");
-        if (time.equals("x")) {
+        if (InputUtil.isCancel(time)) {
             return;
         }
 
-        presenter.showAddSuccess(activityUseCase.addActivity(title, day, time));
+        System.out.println(presenter.formatAddSuccess(activityUseCase.addActivity(title, day, time)));
     }
 
     /** Form ubah judul, hari, dan/atau waktu kegiatan (parsial). */
@@ -85,7 +85,7 @@ public class ActivityView {
         System.out.println("[Mengubah Kegiatan]");
         String strId = InputUtil.input("ID Kegiatan yang diubah (x Jika Batal)");
 
-        if (strId.equals("x")) {
+        if (InputUtil.isCancel(strId)) {
             return;
         }
 
@@ -104,9 +104,9 @@ public class ActivityView {
         String time = newTime.isBlank() ? null : newTime;
 
         if (activityUseCase.updateActivity(id, title, day, time)) {
-            presenter.showUpdateSuccess();
+            System.out.println(presenter.formatUpdateSuccess());
         } else {
-            presenter.showUpdateFailed(id);
+            System.out.println(presenter.formatUpdateFailed(id));
         }
     }
 
@@ -115,8 +115,8 @@ public class ActivityView {
         System.out.println("[Mencari Kegiatan]");
         String keyword = InputUtil.input("Kata Kunci (x Jika Batal)");
 
-        if (!keyword.equals("x")) {
-            presenter.showSearchResults(activityUseCase.searchActivities(keyword), keyword);
+        if (!InputUtil.isCancel(keyword)) {
+            System.out.println(presenter.formatSearchResults(activityUseCase.searchActivities(keyword), keyword));
         }
     }
 
@@ -131,18 +131,18 @@ public class ActivityView {
         System.out.println("x. Batal");
 
         String input = InputUtil.input("Pilih");
-        if (input.equals("x")) {
+        if (InputUtil.isCancel(input)) {
             return;
         }
 
         // Konversi input angka ke enum domain
         SortOption option = mapSortOption(input);
         if (option == null) {
-            presenter.showInvalidSortOption();
+            System.out.println(presenter.formatInvalidSortOption());
             return;
         }
 
-        presenter.showSortedActivities(activityUseCase.sortActivities(option));
+        System.out.println(presenter.formatSortedActivities(activityUseCase.sortActivities(option)));
     }
 
     /** Form hapus kegiatan berdasarkan ID. */
@@ -150,7 +150,7 @@ public class ActivityView {
         System.out.println("[Menghapus Kegiatan]");
         String strId = InputUtil.input("[ID Kegiatan] yang dihapus (x Jika Batal)");
 
-        if (strId.equals("x")) {
+        if (InputUtil.isCancel(strId)) {
             return;
         }
 
@@ -160,9 +160,9 @@ public class ActivityView {
         }
 
         if (activityUseCase.removeActivity(id)) {
-            presenter.showRemoveSuccess();
+            System.out.println(presenter.formatRemoveSuccess());
         } else {
-            presenter.showRemoveFailed(id);
+            System.out.println(presenter.formatRemoveFailed(id));
         }
     }
 
@@ -175,7 +175,7 @@ public class ActivityView {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            presenter.showInvalidId();
+            System.out.println(presenter.formatInvalidId());
             return null;
         }
     }

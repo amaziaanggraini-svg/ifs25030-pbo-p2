@@ -1,10 +1,11 @@
 package adapter.presenter;
 
 import domain.entity.Item;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Presenter yang memformat data dari use case menjadi output layar.
+ * Presenter yang memformat data dari use case menjadi String (tidak mencetak; pencetakan dilakukan oleh View).
  * Format tampilan dipisahkan dari entity (Item tidak punya toString()).
  */
 public class ItemPresenter {
@@ -16,79 +17,80 @@ public class ItemPresenter {
     }
 
     /**
-     * Helper umum untuk menampilkan daftar barang.
-     * Menampilkan pesan kosong jika list tidak berisi data.
+     * Helper umum untuk memformat daftar barang.
+     * Mengembalikan pesan kosong jika list tidak berisi data.
      */
-    private void printList(List<Item> items, String header, String emptyMessage) {
-        System.out.println(header);
+    private String formatList(List<Item> items, String header, String emptyMessage) {
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
 
         if (items.isEmpty()) {
-            System.out.println(emptyMessage);
-            return;
+            lines.add(emptyMessage);
+        } else {
+            for (Item item : items) {
+                lines.add(format(item));
+            }
         }
-
-        for (Item item : items) {
-            System.out.println(format(item));
-        }
+        return String.join(System.lineSeparator(), lines);
     }
 
-    /** Menampilkan daftar semua barang. */
-    public void showItems(List<Item> items) {
-        printList(items, "Daftar Barang:", "- Data barang belum tersedia!");
+    /** Memformat daftar semua barang. */
+    public String formatItems(List<Item> items) {
+        return formatList(items, "Daftar Barang:", "- Data barang belum tersedia!");
     }
 
-    /** Menampilkan hasil pencarian berdasarkan kata kunci. */
-    public void showSearchResults(List<Item> items, String keyword) {
-        printList(items, "Hasil Pencarian: \"" + keyword + "\"", "- Barang tidak ditemukan!");
+    /** Memformat hasil pencarian berdasarkan kata kunci. */
+    public String formatSearchResults(List<Item> items, String keyword) {
+        return formatList(items, "Hasil Pencarian: \"" + keyword + "\"", "- Barang tidak ditemukan!");
     }
 
-    /** Menampilkan daftar barang yang sudah diurutkan. */
-    public void showSortedItems(List<Item> items) {
-        printList(items, "Daftar Barang (Terurut):", "- Data barang belum tersedia!");
+    /** Memformat daftar barang yang sudah diurutkan. */
+    public String formatSortedItems(List<Item> items) {
+        return formatList(items, "Daftar Barang (Terurut):", "- Data barang belum tersedia!");
     }
 
-    /** Menampilkan pesan sukses setelah menambah barang. */
-    public void showAddSuccess(Item item) {
-        System.out.printf("Berhasil menambah barang: %s%n", format(item));
+    /** Memformat pesan sukses setelah menambah barang. */
+    public String formatAddSuccess(Item item) {
+        return String.format("Berhasil menambah barang: %s", format(item));
     }
 
-    /** Menampilkan pesan sukses setelah menghapus barang. */
-    public void showRemoveSuccess() {
-        System.out.println("Berhasil menghapus barang.");
+    /** Memformat pesan sukses setelah menghapus barang. */
+    public String formatRemoveSuccess() {
+        return "Berhasil menghapus barang.";
     }
 
-    /** Menampilkan pesan gagal saat menghapus barang. */
-    public void showRemoveFailed(int id) {
-        System.out.printf("[!] Gagal menghapus barang dengan ID: %d.%n", id);
+    /** Memformat pesan gagal saat menghapus barang. */
+    public String formatRemoveFailed(int id) {
+        return String.format("[!] Gagal menghapus barang dengan ID: %d.", id);
     }
 
-    /** Menampilkan pesan sukses setelah mengubah stok barang. */
-    public void showUpdateSuccess() {
-        System.out.println("Berhasil mengubah stok barang.");
+    /** Memformat pesan sukses setelah mengubah stok barang. */
+    public String formatUpdateSuccess() {
+        return "Berhasil mengubah stok barang.";
     }
 
-    /** Menampilkan pesan gagal saat mengubah barang. */
-    public void showUpdateFailed(int id) {
-        System.out.printf("[!] Gagal mengubah stok barang dengan ID: %d.%n", id);
+    /** Memformat pesan gagal saat mengubah barang. */
+    public String formatUpdateFailed(int id) {
+        return String.format("[!] Gagal mengubah stok barang dengan ID: %d.", id);
     }
 
-    /** Menampilkan pesan saat pilihan menu tidak dikenali. */
-    public void showInvalidChoice() {
-        System.out.println("[!] Pilihan tidak dimengerti.");
+    /** Memformat pesan saat pilihan menu tidak dikenali. */
+    public String formatInvalidChoice() {
+        return "[!] Pilihan tidak dimengerti.";
     }
 
-    /** Menampilkan pesan saat ID yang dimasukkan tidak valid. */
-    public void showInvalidId() {
-        System.out.println("[!] ID tidak valid!");
+    /** Memformat pesan saat ID yang dimasukkan tidak valid. */
+    public String formatInvalidId() {
+        return "[!] ID tidak valid!";
     }
 
-    /** Menampilkan pesan saat jumlah stok tidak valid. */
-    public void showInvalidQuantity() {
-        System.out.println("[!] Jumlah stok tidak valid!");
+    /** Memformat pesan saat jumlah stok tidak valid. */
+    public String formatInvalidQuantity() {
+        return "[!] Jumlah stok tidak valid!";
     }
 
-    /** Menampilkan pesan saat opsi pengurutan tidak valid. */
-    public void showInvalidSortOption() {
-        System.out.println("[!] Pilihan tidak valid!");
+    /** Memformat pesan saat opsi pengurutan tidak valid. */
+    public String formatInvalidSortOption() {
+        return "[!] Pilihan tidak valid!";
     }
 }

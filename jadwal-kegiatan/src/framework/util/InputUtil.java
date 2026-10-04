@@ -14,6 +14,9 @@ public class InputUtil {
      * Menampilkan prompt dan membaca satu baris input dari user.
      * Jika input sudah habis (misalnya saat menjalankan test case),
      * mengembalikan "x" agar aplikasi keluar dengan aman.
+     *
+     * @param info label yang ditampilkan sebelum input
+     * @return teks yang diketik user
      */
     public static String input(String info) {
         System.out.print(info + " : ");
@@ -21,5 +24,10 @@ public class InputUtil {
             return "x";
         }
         return scanner.nextLine();
+    }
+
+    /** Memeriksa apakah input berarti pembatalan ("x" atau "X"). */
+    public static boolean isCancel(String text) {
+        return text.equalsIgnoreCase("x");
     }
 }

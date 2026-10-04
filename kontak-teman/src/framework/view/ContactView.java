@@ -22,7 +22,7 @@ public class ContactView {
     public void show() {
         boolean running = true;
         while (running) {
-            presenter.showContacts(contactUseCase.getAllContacts());
+            System.out.println(presenter.formatContacts(contactUseCase.getAllContacts()));
             printMenu();
 
             String input = InputUtil.input("Pilih");
@@ -33,7 +33,7 @@ public class ContactView {
                 case "4" -> sortContact();
                 case "5" -> removeContact();
                 case "x" -> running = false;
-                default -> presenter.showInvalidChoice();
+                default -> System.out.println(presenter.formatInvalidChoice());
             }
 
             if (running) {
@@ -56,28 +56,28 @@ public class ContactView {
     private void addContact() {
         System.out.println("[Menambah Kontak]");
         String name = InputUtil.input("Nama (x Jika Batal)");
-        if (name.equals("x")) {
+        if (InputUtil.isCancel(name)) {
             return;
         }
 
         String phone = InputUtil.input("Telepon");
-        if (phone.equals("x")) {
+        if (InputUtil.isCancel(phone)) {
             return;
         }
 
         String email = InputUtil.input("Email");
-        if (email.equals("x")) {
+        if (InputUtil.isCancel(email)) {
             return;
         }
 
-        presenter.showAddSuccess(contactUseCase.addContact(name, phone, email));
+        System.out.println(presenter.formatAddSuccess(contactUseCase.addContact(name, phone, email)));
     }
 
     /** Form ubah nama, telepon, dan/atau email (parsial). */
     private void updateContact() {
         System.out.println("[Mengubah Kontak]");
         String strId = InputUtil.input("ID Kontak yang diubah (x Jika Batal)");
-        if (strId.equals("x")) {
+        if (InputUtil.isCancel(strId)) {
             return;
         }
 
@@ -96,9 +96,9 @@ public class ContactView {
         String email = newEmail.isBlank() ? null : newEmail;
 
         if (contactUseCase.updateContact(id, name, phone, email)) {
-            presenter.showUpdateSuccess();
+            System.out.println(presenter.formatUpdateSuccess());
         } else {
-            presenter.showUpdateFailed(id);
+            System.out.println(presenter.formatUpdateFailed(id));
         }
     }
 
@@ -106,8 +106,8 @@ public class ContactView {
         System.out.println("[Mencari Kontak]");
         String keyword = InputUtil.input("Kata Kunci (x Jika Batal)");
 
-        if (!keyword.equals("x")) {
-            presenter.showSearchResults(contactUseCase.searchContacts(keyword), keyword);
+        if (!InputUtil.isCancel(keyword)) {
+            System.out.println(presenter.formatSearchResults(contactUseCase.searchContacts(keyword), keyword));
         }
     }
 
@@ -119,23 +119,23 @@ public class ContactView {
         System.out.println("x. Batal");
 
         String input = InputUtil.input("Pilih");
-        if (input.equals("x")) {
+        if (InputUtil.isCancel(input)) {
             return;
         }
 
         SortOption option = mapSortOption(input);
         if (option == null) {
-            presenter.showInvalidSortOption();
+            System.out.println(presenter.formatInvalidSortOption());
             return;
         }
 
-        presenter.showSortedContacts(contactUseCase.sortContacts(option));
+        System.out.println(presenter.formatSortedContacts(contactUseCase.sortContacts(option)));
     }
 
     private void removeContact() {
         System.out.println("[Menghapus Kontak]");
         String strId = InputUtil.input("[ID Kontak] yang dihapus (x Jika Batal)");
-        if (strId.equals("x")) {
+        if (InputUtil.isCancel(strId)) {
             return;
         }
 
@@ -145,9 +145,9 @@ public class ContactView {
         }
 
         if (contactUseCase.removeContact(id)) {
-            presenter.showRemoveSuccess();
+            System.out.println(presenter.formatRemoveSuccess());
         } else {
-            presenter.showRemoveFailed(id);
+            System.out.println(presenter.formatRemoveFailed(id));
         }
     }
 
@@ -156,7 +156,7 @@ public class ContactView {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            presenter.showInvalidId();
+            System.out.println(presenter.formatInvalidId());
             return null;
         }
     }

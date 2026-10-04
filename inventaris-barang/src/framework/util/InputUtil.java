@@ -25,4 +25,9 @@ public class InputUtil {
         }
         return scanner.nextLine();
     }
+
+    /** Memeriksa apakah input berarti pembatalan ("x" atau "X"). */
+    public static boolean isCancel(String text) {
+        return text.equalsIgnoreCase("x");
+    }
 }

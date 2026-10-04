@@ -1,10 +1,11 @@
 package adapter.presenter;
 
 import domain.entity.Contact;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Presenter yang memformat data kontak menjadi output layar.
+ * Presenter yang memformat data kontak menjadi String (tidak mencetak; pencetakan dilakukan oleh View).
  */
 public class ContactPresenter {
 
@@ -14,60 +15,61 @@ public class ContactPresenter {
                 contact.getId(), contact.getName(), contact.getPhone(), contact.getEmail());
     }
 
-    private void printList(List<Contact> contacts, String header, String emptyMessage) {
-        System.out.println(header);
+    private String formatList(List<Contact> contacts, String header, String emptyMessage) {
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
 
         if (contacts.isEmpty()) {
-            System.out.println(emptyMessage);
-            return;
+            lines.add(emptyMessage);
+        } else {
+            for (Contact item : contacts) {
+                lines.add(format(item));
+            }
         }
-
-        for (Contact contact : contacts) {
-            System.out.println(format(contact));
-        }
+        return String.join(System.lineSeparator(), lines);
     }
 
-    public void showContacts(List<Contact> contacts) {
-        printList(contacts, "Daftar Kontak:", "- Data kontak belum tersedia!");
+    public String formatContacts(List<Contact> contacts) {
+        return formatList(contacts, "Daftar Kontak:", "- Data kontak belum tersedia!");
     }
 
-    public void showSearchResults(List<Contact> contacts, String keyword) {
-        printList(contacts, "Hasil Pencarian: \"" + keyword + "\"", "- Kontak tidak ditemukan!");
+    public String formatSearchResults(List<Contact> contacts, String keyword) {
+        return formatList(contacts, "Hasil Pencarian: \"" + keyword + "\"", "- Kontak tidak ditemukan!");
     }
 
-    public void showSortedContacts(List<Contact> contacts) {
-        printList(contacts, "Daftar Kontak (Terurut):", "- Data kontak belum tersedia!");
+    public String formatSortedContacts(List<Contact> contacts) {
+        return formatList(contacts, "Daftar Kontak (Terurut):", "- Data kontak belum tersedia!");
     }
 
-    public void showAddSuccess(Contact contact) {
-        System.out.printf("Berhasil menambah kontak: %s%n", format(contact));
+    public String formatAddSuccess(Contact contact) {
+        return String.format("Berhasil menambah kontak: %s", format(contact));
     }
 
-    public void showRemoveSuccess() {
-        System.out.println("Berhasil menghapus kontak.");
+    public String formatRemoveSuccess() {
+        return "Berhasil menghapus kontak.";
     }
 
-    public void showRemoveFailed(int id) {
-        System.out.printf("[!] Gagal menghapus kontak dengan ID: %d.%n", id);
+    public String formatRemoveFailed(int id) {
+        return String.format("[!] Gagal menghapus kontak dengan ID: %d.", id);
     }
 
-    public void showUpdateSuccess() {
-        System.out.println("Berhasil mengubah kontak.");
+    public String formatUpdateSuccess() {
+        return "Berhasil mengubah kontak.";
     }
 
-    public void showUpdateFailed(int id) {
-        System.out.printf("[!] Gagal mengubah kontak dengan ID: %d.%n", id);
+    public String formatUpdateFailed(int id) {
+        return String.format("[!] Gagal mengubah kontak dengan ID: %d.", id);
     }
 
-    public void showInvalidChoice() {
-        System.out.println("[!] Pilihan tidak dimengerti.");
+    public String formatInvalidChoice() {
+        return "[!] Pilihan tidak dimengerti.";
     }
 
-    public void showInvalidId() {
-        System.out.println("[!] ID tidak valid!");
+    public String formatInvalidId() {
+        return "[!] ID tidak valid!";
     }
 
-    public void showInvalidSortOption() {
-        System.out.println("[!] Pilihan tidak valid!");
+    public String formatInvalidSortOption() {
+        return "[!] Pilihan tidak valid!";
     }
 }

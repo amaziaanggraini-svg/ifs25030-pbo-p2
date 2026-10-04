@@ -1,10 +1,11 @@
 package adapter.presenter;
 
 import domain.entity.Activity;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Presenter yang memformat data dari use case menjadi output layar.
+ * Presenter yang memformat data dari use case menjadi String (tidak mencetak; pencetakan dilakukan oleh View).
  * Format tampilan dipisahkan dari entity (Activity tidak punya toString()).
  */
 public class ActivityPresenter {
@@ -16,74 +17,75 @@ public class ActivityPresenter {
     }
 
     /**
-     * Helper umum untuk menampilkan daftar kegiatan.
-     * Menampilkan pesan kosong jika list tidak berisi data.
+     * Helper umum untuk memformat daftar kegiatan.
+     * Mengembalikan pesan kosong jika list tidak berisi data.
      */
-    private void printList(List<Activity> activities, String header, String emptyMessage) {
-        System.out.println(header);
+    private String formatList(List<Activity> activities, String header, String emptyMessage) {
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
 
         if (activities.isEmpty()) {
-            System.out.println(emptyMessage);
-            return;
+            lines.add(emptyMessage);
+        } else {
+            for (Activity item : activities) {
+                lines.add(format(item));
+            }
         }
-
-        for (Activity activity : activities) {
-            System.out.println(format(activity));
-        }
+        return String.join(System.lineSeparator(), lines);
     }
 
-    /** Menampilkan daftar semua kegiatan. */
-    public void showActivities(List<Activity> activities) {
-        printList(activities, "Daftar Kegiatan:", "- Data kegiatan belum tersedia!");
+    /** Memformat daftar semua kegiatan. */
+    public String formatActivities(List<Activity> activities) {
+        return formatList(activities, "Daftar Kegiatan:", "- Data kegiatan belum tersedia!");
     }
 
-    /** Menampilkan hasil pencarian berdasarkan kata kunci. */
-    public void showSearchResults(List<Activity> activities, String keyword) {
-        printList(activities, "Hasil Pencarian: \"" + keyword + "\"", "- Kegiatan tidak ditemukan!");
+    /** Memformat hasil pencarian berdasarkan kata kunci. */
+    public String formatSearchResults(List<Activity> activities, String keyword) {
+        return formatList(activities, "Hasil Pencarian: \"" + keyword + "\"", "- Kegiatan tidak ditemukan!");
     }
 
-    /** Menampilkan daftar kegiatan yang sudah diurutkan. */
-    public void showSortedActivities(List<Activity> activities) {
-        printList(activities, "Daftar Kegiatan (Terurut):", "- Data kegiatan belum tersedia!");
+    /** Memformat daftar kegiatan yang sudah diurutkan. */
+    public String formatSortedActivities(List<Activity> activities) {
+        return formatList(activities, "Daftar Kegiatan (Terurut):", "- Data kegiatan belum tersedia!");
     }
 
-    /** Menampilkan pesan sukses setelah menambah kegiatan. */
-    public void showAddSuccess(Activity activity) {
-        System.out.printf("Berhasil menambah kegiatan: %s%n", format(activity));
+    /** Memformat pesan sukses setelah menambah kegiatan. */
+    public String formatAddSuccess(Activity activity) {
+        return String.format("Berhasil menambah kegiatan: %s", format(activity));
     }
 
-    /** Menampilkan pesan sukses setelah menghapus kegiatan. */
-    public void showRemoveSuccess() {
-        System.out.println("Berhasil menghapus kegiatan.");
+    /** Memformat pesan sukses setelah menghapus kegiatan. */
+    public String formatRemoveSuccess() {
+        return "Berhasil menghapus kegiatan.";
     }
 
-    /** Menampilkan pesan gagal saat menghapus kegiatan. */
-    public void showRemoveFailed(int id) {
-        System.out.printf("[!] Gagal menghapus kegiatan dengan ID: %d.%n", id);
+    /** Memformat pesan gagal saat menghapus kegiatan. */
+    public String formatRemoveFailed(int id) {
+        return String.format("[!] Gagal menghapus kegiatan dengan ID: %d.", id);
     }
 
-    /** Menampilkan pesan sukses setelah mengubah kegiatan. */
-    public void showUpdateSuccess() {
-        System.out.println("Berhasil mengubah kegiatan.");
+    /** Memformat pesan sukses setelah mengubah kegiatan. */
+    public String formatUpdateSuccess() {
+        return "Berhasil mengubah kegiatan.";
     }
 
-    /** Menampilkan pesan gagal saat mengubah kegiatan. */
-    public void showUpdateFailed(int id) {
-        System.out.printf("[!] Gagal mengubah kegiatan dengan ID: %d.%n", id);
+    /** Memformat pesan gagal saat mengubah kegiatan. */
+    public String formatUpdateFailed(int id) {
+        return String.format("[!] Gagal mengubah kegiatan dengan ID: %d.", id);
     }
 
-    /** Menampilkan pesan saat pilihan menu tidak dikenali. */
-    public void showInvalidChoice() {
-        System.out.println("[!] Pilihan tidak dimengerti.");
+    /** Memformat pesan saat pilihan menu tidak dikenali. */
+    public String formatInvalidChoice() {
+        return "[!] Pilihan tidak dimengerti.";
     }
 
-    /** Menampilkan pesan saat ID yang dimasukkan tidak valid. */
-    public void showInvalidId() {
-        System.out.println("[!] ID tidak valid!");
+    /** Memformat pesan saat ID yang dimasukkan tidak valid. */
+    public String formatInvalidId() {
+        return "[!] ID tidak valid!";
     }
 
-    /** Menampilkan pesan saat opsi pengurutan tidak valid. */
-    public void showInvalidSortOption() {
-        System.out.println("[!] Pilihan tidak valid!");
+    /** Memformat pesan saat opsi pengurutan tidak valid. */
+    public String formatInvalidSortOption() {
+        return "[!] Pilihan tidak valid!";
     }
 }

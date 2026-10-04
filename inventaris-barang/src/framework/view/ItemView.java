@@ -27,7 +27,7 @@ public class ItemView {
         boolean running = true;
         while (running) {
             // Tampilkan daftar barang terkini sebelum menu
-            presenter.showItems(itemUseCase.getAllItems());
+            System.out.println(presenter.formatItems(itemUseCase.getAllItems()));
             printMenu();
 
             String input = InputUtil.input("Pilih");
@@ -38,7 +38,7 @@ public class ItemView {
                 case "4" -> sortItem();
                 case "5" -> removeItem();
                 case "x" -> running = false;
-                default -> presenter.showInvalidChoice();
+                default -> System.out.println(presenter.formatInvalidChoice());
             }
 
             if (running) {
@@ -63,7 +63,7 @@ public class ItemView {
         System.out.println("[Menambah Barang]");
         String name = InputUtil.input("Nama (x Jika Batal)");
 
-        if (name.equals("x")) {
+        if (InputUtil.isCancel(name)) {
             return;
         }
 
@@ -75,7 +75,7 @@ public class ItemView {
 
         String category = InputUtil.input("Kategori (x Jika Batal)");
 
-        presenter.showAddSuccess(itemUseCase.addItem(name, quantity, category));
+        System.out.println(presenter.formatAddSuccess(itemUseCase.addItem(name, quantity, category)));
     }
 
     /** Form ubah stok barang (parsial: kosongkan = tidak diubah). */
@@ -83,7 +83,7 @@ public class ItemView {
         System.out.println("[Mengubah Stok]");
         String strIdItem = InputUtil.input("ID Barang yang diubah (x Jika Batal)");
 
-        if (strIdItem.equals("x")) {
+        if (InputUtil.isCancel(strIdItem)) {
             return;
         }
 
@@ -104,9 +104,9 @@ public class ItemView {
         }
 
         if (itemUseCase.updateStock(id, quantity)) {
-            presenter.showUpdateSuccess();
+            System.out.println(presenter.formatUpdateSuccess());
         } else {
-            presenter.showUpdateFailed(id);
+            System.out.println(presenter.formatUpdateFailed(id));
         }
     }
 
@@ -115,8 +115,8 @@ public class ItemView {
         System.out.println("[Mencari Barang]");
         String keyword = InputUtil.input("Kata Kunci (x Jika Batal)");
 
-        if (!keyword.equals("x")) {
-            presenter.showSearchResults(itemUseCase.searchItems(keyword), keyword);
+        if (!InputUtil.isCancel(keyword)) {
+            System.out.println(presenter.formatSearchResults(itemUseCase.searchItems(keyword), keyword));
         }
     }
 
@@ -131,18 +131,18 @@ public class ItemView {
         System.out.println("x. Batal");
 
         String input = InputUtil.input("Pilih");
-        if (input.equals("x")) {
+        if (InputUtil.isCancel(input)) {
             return;
         }
 
         // Konversi input angka ke enum domain
         SortOption option = mapSortOption(input);
         if (option == null) {
-            presenter.showInvalidSortOption();
+            System.out.println(presenter.formatInvalidSortOption());
             return;
         }
 
-        presenter.showSortedItems(itemUseCase.sortItems(option));
+        System.out.println(presenter.formatSortedItems(itemUseCase.sortItems(option)));
     }
 
     /** Form hapus barang berdasarkan ID. */
@@ -150,7 +150,7 @@ public class ItemView {
         System.out.println("[Menghapus Barang]");
         String strIdItem = InputUtil.input("[ID Barang] yang dihapus (x Jika Batal)");
 
-        if (strIdItem.equals("x")) {
+        if (InputUtil.isCancel(strIdItem)) {
             return;
         }
 
@@ -160,9 +160,9 @@ public class ItemView {
         }
 
         if (itemUseCase.removeItem(id)) {
-            presenter.showRemoveSuccess();
+            System.out.println(presenter.formatRemoveSuccess());
         } else {
-            presenter.showRemoveFailed(id);
+            System.out.println(presenter.formatRemoveFailed(id));
         }
     }
 
@@ -175,7 +175,7 @@ public class ItemView {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            presenter.showInvalidId();
+            System.out.println(presenter.formatInvalidId());
             return null;
         }
     }
@@ -189,12 +189,12 @@ public class ItemView {
         try {
             int quantity = Integer.parseInt(value);
             if (quantity <= 0) {
-                presenter.showInvalidQuantity();
+                System.out.println(presenter.formatInvalidQuantity());
                 return null;
             }
             return quantity;
         } catch (NumberFormatException e) {
-            presenter.showInvalidQuantity();
+            System.out.println(presenter.formatInvalidQuantity());
             return null;
         }
     }
